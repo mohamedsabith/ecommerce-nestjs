@@ -21,7 +21,9 @@ export class InternalExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       error: {
-        name: exception.constructor.name,
+        name: exception.constructor.name
+          ? exception.constructor.name
+          : 'Exception Error',
         message: exception.message,
       },
     };
