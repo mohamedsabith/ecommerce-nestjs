@@ -1,0 +1,43 @@
+# Ignore Node.js modules
+node_modules/
+
+# Ignore build artifacts and output directories
+dist/
+build/
+out/
+
+# Ignore editor/IDE-specific files
+.vscode/
+.idea/
+
+# Ignore log files and temporary files
+*.log
+*.tmp
+
+# Ignore environment-specific files (e.g., .env)
+.env*
+
+# Ignore sensitive files containing secrets or API keys
+secrets.json
+config.json
+
+# Ignore generated documentation
+doc/
+
+# Ignore dependencies or configurations for specific build tools
+# For example, ignore all files related to Yarn
+.yarn/
+
+# Ignore OS-specific files
+.DS_Store  # macOS
+Thumbs.db  # Windows
+
+# Ignore backups created by text editors
+*~
+
+# Ignore compiled code or binary files
+*.exe
+*.dll
+*.so
+*.dylib
+

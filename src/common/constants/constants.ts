@@ -1,0 +1,12 @@
+export const PASSWORD_HASH_SALT = 10;
+export const JWT_ACCESS_TOKEN_EXPIRATION_TIME = '1d';
+export const JWT_REFRESH_TOKEN_EXPIRATION_TIME = '2d';
+export const JWT_FORGOT_PASSWORD_TOKEN_EXPIRATION_TIME = '5m';
+export const APP_NAME = 'Ecommerce API';
+export const APP_DESCRIPTION = 'Simple Ecommerce API.';
+export const APP_VERSION = '1.0.0';
+export const API_PREFIX = 'api/v1';
+export const ALLOWED_ORIGINS = 'https://example.com,https://localhost:3000';
+export const ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+export const ALLOWED_HEADERS = 'Content-Type,Authorization';
+export const MAX_AGE = 3600;
