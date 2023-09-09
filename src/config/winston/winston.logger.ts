@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+import { customTimestamp } from '../../utils/timestamp';
 
 const TransportOptions = {
   maxsize: 20 * 1024 * 1024, // 20MB
@@ -11,7 +12,7 @@ const winstonLogger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
     winston.format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss.SSS',
+      format: customTimestamp,
     }),
   ),
   transports: [
@@ -34,10 +35,7 @@ const winstonLogger = winston.createLogger({
         winston.format.colorize(),
         winston.format.simple(),
         winston.format.printf(
-          (info) =>
-            `${info.level}: ${info.message}${
-              info.stack ? `\n${info.stack}` : ''
-            }`,
+          (info) => `${customTimestamp()} [${info.level}]: ${info.message}`,
         ),
       ),
       handleExceptions: true,
