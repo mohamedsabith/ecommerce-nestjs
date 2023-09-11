@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
+import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import {
   API_PREFIX,
@@ -17,6 +18,7 @@ import { rateLimitMiddleware } from './middlewares/rate-limit.middleware';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { InternalExceptionFilter } from './filters/internal-exception.filter';
 import { MyLogger } from './utils/logger';
+import { swaggerOptions } from './config/swagger/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -72,10 +74,14 @@ async function bootstrap() {
     }),
   );
 
+  const document = SwaggerModule.createDocument(app, swaggerOptions);
+  SwaggerModule.setup('api', app, document);
+
   const PORT = configService.get<number>('PORT', 3000);
 
   await app.listen(PORT, () => {
-    logger.verbose(`Server is running on port ${PORT}`);
+    logger.verbose(`Server started at http://localhost:${PORT}`);
+    logger.verbose(`Swagger-ui is available on http://localhost:${PORT}/api`);
   });
 }
 bootstrap();
