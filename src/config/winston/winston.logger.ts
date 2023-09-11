@@ -29,6 +29,7 @@ const winstonLogger = winston.createLogger({
       filename: 'logs/exceptions.log',
       ...TransportOptions,
       handleExceptions: true,
+      level: 'error',
     }),
     new winston.transports.Console({
       format: winston.format.combine(

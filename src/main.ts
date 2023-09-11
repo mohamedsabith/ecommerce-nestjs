@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import * as compression from 'compression';
@@ -15,20 +15,20 @@ import {
 } from './common/constants/constants';
 import { rateLimitMiddleware } from './middlewares/rate-limit.middleware';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
-import winstonLogger from './config/winston/winston.logger';
 import { InternalExceptionFilter } from './filters/internal-exception.filter';
+import { MyLogger } from './utils/logger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const logger = new Logger('Server');
+  const logger = new MyLogger('Server');
 
   // -- Cors setup
   app.enableCors({
     origin: ALLOWED_ORIGINS.split(','), // Set this to the origin(s) that you want to allow
     methods: ALLOWED_METHODS,
     allowedHeaders: ALLOWED_HEADERS,
-    maxAge: MAX_AGE, // 1 hour
+    maxAge: MAX_AGE,
   });
 
   // -- Helmet
@@ -41,7 +41,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  //HttpException Filter
+  //Exception Filter
   app.useGlobalFilters(
     new InternalExceptionFilter(),
     new HttpExceptionFilter(),
@@ -76,7 +76,6 @@ async function bootstrap() {
 
   await app.listen(PORT, () => {
     logger.verbose(`Server is running on port ${PORT}`);
-    winstonLogger.info(`Server is running on port ${PORT}`);
   });
 }
 bootstrap();
