@@ -36,7 +36,10 @@ const winstonLogger = winston.createLogger({
         winston.format.colorize(),
         winston.format.simple(),
         winston.format.printf(
-          (info) => `${customTimestamp()} [${info.level}]: ${info.message}`,
+          (info) =>
+            `${customTimestamp()} [${info.level}]: \x1b[33m[${
+              info.name
+            }] \x1b[31m${info.message}`,
         ),
       ),
       handleExceptions: true,

@@ -11,4 +11,7 @@ export default Joi.object({
   DB_DATABASE: Joi.string().required(),
   RUN_MIGRATIONS: Joi.boolean().default(true),
   DB_TYPE: Joi.string().required(),
+  TWILIO_ACCOUNT_SID: Joi.string().required(),
+  TWILIO_AUTH_TOKEN: Joi.string().required(),
+  TWILIO_PHONE_NUMBER: Joi.number().required(),
 });

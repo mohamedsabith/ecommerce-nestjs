@@ -28,25 +28,59 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const name = exception.getResponse();
+    let name: string;
+    let message: object | string;
+
+    if (status === HttpStatus.BAD_REQUEST) {
+      // Handle validation errors
+      name = 'Validation Error';
+      if (exception.response.message) {
+        if (Array.isArray(exception.response.message)) {
+          // If multiple validation errors, use them all
+          message = exception.response.message;
+        } else if (typeof exception.response.message === 'object') {
+          // If it's an object, assume it's a validation error object
+          message = Object.values(exception.response.message);
+        } else {
+          // If it's a string, use it as is
+          message = exception.response.message;
+        }
+      } else {
+        // Default message for validation errors
+        message = 'Validation failed';
+      }
+    } else {
+      // Handle other errors
+      const errorName = exception.getResponse();
+
+      if (errorName === 'ThrottlerException: Too Many Requests') {
+        name = 'Too Many Requests';
+        message = 'Maximum attempts reached. Please go back and try again.';
+      } else {
+        name = errorName['error'] ? errorName['error'] : errorName;
+        message = exception.message || 'Something went wrong';
+      }
+    }
 
     const errorResponse: ErrorResponse = {
       timestamp: new Date().toISOString(),
       path: request.url,
       error: {
-        name: status == 500 ? 'Unknown' : name['error'] ? name['error'] : name,
-        message: status == 500 ? 'Something Went Wrong' : exception.message,
+        name,
+        message,
       },
     };
 
     const winstonErrorMessage = {
       path: request.url,
-      name: status == 500 ? 'Unknown' : name['error'] ? name['error'] : name,
-      message: status == 500 ? 'Something Went Wrong' : exception.message,
+      name,
+      message,
     };
 
+    // Log the error
     winstonLogger.error(winstonErrorMessage);
 
-    response.status(status == 500 ? 400 : status).json(errorResponse);
+    // Set the HTTP status code and send the JSON response
+    response.status(status).json(errorResponse);
   }
 }

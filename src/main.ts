@@ -43,12 +43,6 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  //Exception Filter
-  app.useGlobalFilters(
-    new InternalExceptionFilter(),
-    new HttpExceptionFilter(),
-  );
-
   app.use(bodyParser.json({ limit: '30mb' }));
   app.use(
     bodyParser.urlencoded({
@@ -68,10 +62,17 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       forbidUnknownValues: true,
       transform: true,
+      validationError: { target: false },
       transformOptions: {
         enableImplicitConversion: true,
       },
     }),
+  );
+
+  //Exception Filter
+  app.useGlobalFilters(
+    new InternalExceptionFilter(),
+    new HttpExceptionFilter(),
   );
 
   const document = SwaggerModule.createDocument(app, swaggerOptions);
