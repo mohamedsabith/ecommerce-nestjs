@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as basicAuth from 'express-basic-auth';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
@@ -75,14 +76,26 @@ async function bootstrap() {
     new HttpExceptionFilter(),
   );
 
+  app.use(
+    ['/api/docs', '/api/docs-json'],
+    basicAuth({
+      challenge: true,
+      users: {
+        [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD,
+      },
+    }),
+  );
+
   const document = SwaggerModule.createDocument(app, swaggerOptions);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/docs', app, document);
 
   const PORT = configService.get<number>('PORT', 3000);
 
   await app.listen(PORT, () => {
     logger.verbose(`Server started at http://localhost:${PORT}`);
-    logger.verbose(`Swagger-ui is available on http://localhost:${PORT}/api`);
+    logger.verbose(
+      `Swagger-ui is available on http://localhost:${PORT}/api/docs`,
+    );
   });
 }
 bootstrap();

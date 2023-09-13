@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiOperation } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
+import { AuthService } from './service/auth.service';
 import {
   PhoneNumberDto,
   OTPVerificationDto,

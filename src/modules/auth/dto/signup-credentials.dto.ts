@@ -8,6 +8,7 @@ import {
   Matches,
 } from 'class-validator';
 import { IsNumberLength } from 'src/decorators/IsNumberLength.decorator';
+import { IsPasswordMatch } from 'src/decorators/password-match.decorator';
 
 // Step 1: Phone Number Verification DTO
 export class PhoneNumberDto {
@@ -78,5 +79,6 @@ export class SignupCredentialsDto {
   password: string;
 
   @IsNotEmpty({ message: 'Confirm password is required' })
+  @IsPasswordMatch({ message: 'Passwords do not match' })
   confirmPassword: string;
 }

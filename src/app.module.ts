@@ -7,6 +7,7 @@ import { CustomConfigModule } from './config/config.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AuthModule } from './modules/auth/auth.module';
       },
     ]),
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [

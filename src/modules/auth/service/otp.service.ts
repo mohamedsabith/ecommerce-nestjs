@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Otp } from '../entities/otp.entity';
 import { Twilio } from 'twilio';
-import { ConfigService } from '@nestjs/config';
+import { JwtTokenService } from './jwt.service';
 
 @Injectable()
 export class OtpService {
@@ -13,6 +14,7 @@ export class OtpService {
     private readonly configService: ConfigService,
     @InjectRepository(Otp)
     private readonly otpRepository: Repository<Otp>,
+    private jwtService: JwtTokenService,
   ) {
     // Initialize Twilio client using your credentials from the configuration
     const twilioAccountSid =
@@ -75,6 +77,19 @@ export class OtpService {
       return { status: false, message: 'Invalid OTP.' };
     }
 
-    return { status: true, message: 'OTP is valid.' };
+    const jwtPayload = {
+      firstName: enteredOtp.toString(),
+      lastName: enteredOtp.toString(),
+      email: '@gmail.com',
+      phoneNumber: phoneNumber,
+      role: 'User',
+    };
+
+    return {
+      status: true,
+      message: 'OTP is valid.',
+      phoneNumber,
+      token: await this.jwtService.getAccessToken(jwtPayload, 5),
+    };
   }
 }

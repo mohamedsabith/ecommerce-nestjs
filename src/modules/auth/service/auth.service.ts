@@ -3,14 +3,13 @@ import {
   PhoneNumberDto,
   OTPVerificationDto,
   SignupCredentialsDto,
-} from './dto/signup-credentials.dto';
-import { OtpService } from './service/otp-sender.service';
+} from '../dto/signup-credentials.dto';
+import { OtpService } from './otp.service';
 import { generateOTP } from 'src/utils/otp.util';
 
 @Injectable()
 export class AuthService {
   constructor(private otpService: OtpService) {}
-  private otpStore: Map<string, string> = new Map();
 
   async verifyPhoneNumber(phoneNumberDto: PhoneNumberDto) {
     const otp: number = await generateOTP(6);
