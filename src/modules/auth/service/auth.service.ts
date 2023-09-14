@@ -17,7 +17,7 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 1);
 
-    this.otpService.createOtp(otp, phoneNumberDto.phoneNumber, expiresAt);
+    await this.otpService.createOtp(otp, phoneNumberDto.phoneNumber, expiresAt);
 
     return this.otpService.sendOTP(
       phoneNumberDto.phoneNumber,

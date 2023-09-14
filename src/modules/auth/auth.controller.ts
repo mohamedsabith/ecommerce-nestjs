@@ -42,4 +42,20 @@ export class AuthController {
   OtpVerification(@Body() OtpVerificationDto: OTPVerificationDto) {
     return this.authService.OtpVerification(OtpVerificationDto);
   }
+
+  @Throttle({
+    default: {
+      limit: 10,
+      ttl: 60000,
+    },
+  })
+  @Post('/signup')
+  @ApiOperation({
+    summary: 'User Registration with Additional Details',
+    description:
+      'Register as a user with personal and optional information to access our platforms features and enjoy a personalized experience.',
+  })
+  SignUp(@Body() OtpVerificationDto: OTPVerificationDto) {
+    return this.authService.OtpVerification(OtpVerificationDto);
+  }
 }

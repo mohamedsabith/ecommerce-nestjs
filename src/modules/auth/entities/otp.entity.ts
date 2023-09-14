@@ -20,6 +20,15 @@ export class Otp {
   @Column()
   expiresAt: Date;
 
+  @Column({ default: 0 })
+  otpSendCount: number;
+
+  @Column({ default: new Date() })
+  lastOtpSendDate: Date;
+
+  @Column({ default: false })
+  isBlocked: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

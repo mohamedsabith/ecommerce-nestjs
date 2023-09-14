@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Otp } from '../entities/otp.entity';
 import { Twilio } from 'twilio';
@@ -28,7 +28,48 @@ export class OtpService {
     phoneNumber: number,
     expiresAt: Date,
   ): Promise<Otp> {
-    return this.otpRepository.save({ otpValue, phoneNumber, expiresAt });
+    const latestOtp = await this.otpRepository.findOne({
+      where: { phoneNumber },
+      order: { createdAt: 'DESC' },
+    });
+
+    let otpSendCount = 1;
+
+    if (latestOtp) {
+      otpSendCount = latestOtp.otpSendCount + 1;
+    }
+    return this.otpRepository.save({
+      otpValue,
+      phoneNumber,
+      expiresAt,
+      otpSendCount,
+    });
+  }
+
+  async getOtpCountForDay(phoneNumber: number): Promise<number> {
+    try {
+      const currentDate = new Date();
+
+      const startOfDay = new Date(currentDate);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(currentDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const otpCount = await this.otpRepository.count({
+        where: {
+          phoneNumber,
+          createdAt: Between(startOfDay, endOfDay),
+        },
+      });
+
+      return otpCount;
+    } catch (error) {
+      console.error(
+        `Error retrieving OTP count for ${phoneNumber}: ${error.message}`,
+      );
+      throw error;
+    }
   }
 
   async sendOTP(
@@ -37,11 +78,19 @@ export class OtpService {
     otp: number,
   ): Promise<string> {
     try {
+      const otpCount = await this.getOtpCountForDay(phoneNumber);
+      const otpLimit = 10;
+
+      if (otpCount >= otpLimit) {
+        return 'OTP limit exceeded. Try again later.';
+      }
+
       const message = await this.twilioClient.messages.create({
         body: `Your OTP is: ${otp}`,
         from: this.configService.get<string>('TWILIO_PHONE_NUMBER'), // Your Twilio phone number
         to: countryCode + phoneNumber, // Recipient's phone number
       });
+
       return `OTP sent to ${phoneNumber}: ${message.sid}`; // OTP sent successfully
     } catch (error) {
       console.error(`Error sending OTP to ${phoneNumber}: ${error.message}`);
@@ -49,7 +98,7 @@ export class OtpService {
     }
   }
 
-  async getOtp(phoneNumber: number): Promise<Otp | undefined> {
+  async getOtpByNumber(phoneNumber: number): Promise<Otp | undefined> {
     return this.otpRepository
       .createQueryBuilder('otp')
       .where('otp.phoneNumber = :phoneNumber', { phoneNumber })
@@ -60,7 +109,7 @@ export class OtpService {
   }
 
   async verifyOtp(phoneNumber: number, enteredOtp: number): Promise<object> {
-    const getOtpByNumber = await this.getOtp(phoneNumber);
+    const getOtpByNumber = await this.getOtpByNumber(phoneNumber);
 
     if (!getOtpByNumber) {
       return { status: false, message: 'OTP not found.' };
